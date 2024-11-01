@@ -51,8 +51,27 @@ def _setup_celery(app):
 
 def _setup_db(app):
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///db.sqlite3")
+
     db.init_app(app)
-    migrate.init_app(app, directory=os.path.join(app.root_path, "migrations"))
+
+    app.logger.warning(f"Creating database... {app.config['SQLALCHEMY_DATABASE_URI']}")
+    try:
+        with app.app_context():
+            db.create_all()
+            app.logger.warning("Database created successfully.")
+
+            app.logger.warning("Committing session...")
+            db.session.commit()
+            app.logger.warning("Session committed successfully.")
+
+            migrate.init_app(app, directory=os.path.join(app.root_path, "migrations"))
+            app.logger.warning("Migration initialized successfully.")
+    except Exception as e:
+        app.logger.error(f"Error during database setup: {str(e)}")
+        raise
+
+    app.logger.info("Database setup completed.")
 
 
 def _configure_app(app, from_env=True):
