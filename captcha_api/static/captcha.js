@@ -1,4 +1,4 @@
-const captchaApiUrl = "https://captcha.web.cern.ch/api/v1.0";
+const captchaApiUrl = "http://localhost:5000/api/v1.0";
 
 class CaptchaApiClient {
     baseUrl = captchaApiUrl;
