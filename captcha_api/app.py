@@ -90,8 +90,10 @@ def create_app(config_override=None, use_env_config=True) -> Flask:
     _configure_app(app, use_env_config)
 
     app.wsgi_app = ProxyFix(app.wsgi_app)
-    CORS(app)
-
+    CORS(app,
+         resource={
+           r"/*": {"origins": "*"}
+    })
     _setup_db(app)
     _setup_api(app)
 
